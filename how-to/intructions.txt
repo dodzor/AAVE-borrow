@@ -1,0 +1,15 @@
+* build an app that uses AAVE 
+* create a smart contract with a function that deposits ETH into AAVE and borrow DAI agains the ETH in a single transactions
+* steps:
+    1. deposit ETH
+    2. borrow DAI and send it to the users wallet, not the smart contract itself
+* the smart contract implements the AAVE contract
+* Ganache-CLI -> fork the ETH mainet and use the AAVE contracts without spending crypto 
+* REQUIREMENTS:
+    1. smart contract
+    2. test
+    3. migration script
+    4. reactjs website(at least a borrow button that calls the function)
+* starter kit: https://github.com/dappuniversity/starter_kit
+* READ ME with instructions
+* demo the project
