@@ -1,0 +1,869 @@
+{
+  "contractName": "ILendingPool",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "onBehalfOf",
+          "type": "address"
+        },
+        {
+          "internalType": "uint16",
+          "name": "referralCode",
+          "type": "uint16"
+        }
+      ],
+      "name": "deposit",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "interestRateMode",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint16",
+          "name": "referralCode",
+          "type": "uint16"
+        },
+        {
+          "internalType": "address",
+          "name": "onBehalfOf",
+          "type": "address"
+        }
+      ],
+      "name": "borrow",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "getUserAccountData",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "totalCollateralETH",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "totalDebtETH",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "availableBorrowsETH",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "currentLiquidationThreshold",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "ltv",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "healthFactor",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "useAsCollateral",
+          "type": "bool"
+        }
+      ],
+      "name": "setUserUseReserveAsCollateral",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.4+commit.c7e474f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"asset\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"interestRateMode\",\"type\":\"uint256\"},{\"internalType\":\"uint16\",\"name\":\"referralCode\",\"type\":\"uint16\"},{\"internalType\":\"address\",\"name\":\"onBehalfOf\",\"type\":\"address\"}],\"name\":\"borrow\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"asset\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"onBehalfOf\",\"type\":\"address\"},{\"internalType\":\"uint16\",\"name\":\"referralCode\",\"type\":\"uint16\"}],\"name\":\"deposit\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"}],\"name\":\"getUserAccountData\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"totalCollateralETH\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"totalDebtETH\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"availableBorrowsETH\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"currentLiquidationThreshold\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"ltv\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"healthFactor\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"asset\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"useAsCollateral\",\"type\":\"bool\"}],\"name\":\"setUserUseReserveAsCollateral\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"borrow(address,uint256,uint256,uint16,address)\":{\"details\":\"Allows users to borrow a specific `amount` of the reserve underlying asset, provided that the borrower already deposited enough collateral, or he was given enough allowance by a credit delegator on the corresponding debt token (StableDebtToken or VariableDebtToken) - E.g. User borrows 100 USDC passing as `onBehalfOf` his own address, receiving the 100 USDC in his wallet   and 100 stable/variable debt tokens, depending on the `interestRateMode`\",\"params\":{\"amount\":\"The amount to be borrowed\",\"asset\":\"The address of the underlying asset to borrow\",\"interestRateMode\":\"The interest rate mode at which the user wants to borrow: 1 for Stable, 2 for Variable\",\"onBehalfOf\":\"Address of the user who will receive the debt. Should be the address of the borrower itself calling the function if he wants to borrow against his own collateral, or the address of the credit delegator if he has been given credit delegation allowance*\",\"referralCode\":\"Code used to register the integrator originating the operation, for potential rewards.   0 if the action is executed directly by the user, without any middle-man\"}},\"deposit(address,uint256,address,uint16)\":{\"details\":\"Deposits an `amount` of underlying asset into the reserve, receiving in return overlying aTokens. - E.g. User deposits 100 USDC and gets in return 100 aUSDC\",\"params\":{\"amount\":\"The amount to be deposited\",\"asset\":\"The address of the underlying asset to deposit\",\"onBehalfOf\":\"The address that will receive the aTokens, same as msg.sender if the user   wants to receive them on his own wallet, or a different address if the beneficiary of aTokens   is a different wallet\",\"referralCode\":\"Code used to register the integrator originating the operation, for potential rewards.   0 if the action is executed directly by the user, without any middle-man*\"}},\"getUserAccountData(address)\":{\"details\":\"Returns the user account data across all the reserves\",\"params\":{\"user\":\"The address of the user\"},\"returns\":{\"availableBorrowsETH\":\"the borrowing power left of the user\",\"currentLiquidationThreshold\":\"the liquidation threshold of the user\",\"healthFactor\":\"the current health factor of the user*\",\"ltv\":\"the loan to value of the user\",\"totalCollateralETH\":\"the total collateral in ETH of the user\",\"totalDebtETH\":\"the total debt in ETH of the user\"}},\"setUserUseReserveAsCollateral(address,bool)\":{\"details\":\"Allows depositors to enable/disable a specific deposited asset as collateral\",\"params\":{\"asset\":\"The address of the underlying asset deposited\",\"useAsCollateral\":\"`true` if the user wants to use the deposit as collateral, `false` otherwise*\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/src/contracts/ILendingPool.sol\":\"ILendingPool\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/src/contracts/ILendingPool.sol\":{\"keccak256\":\"0x59c40f1f4e47b9969e305cde005c55836b77f136544ca8a676a7731bd5260aa7\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://71dfb977b99e34fbdeabec05e1f0d8efcd5b2e2bb77260aecf2a69a6142b55ef\",\"dweb:/ipfs/QmReeJ1Kt57qAk4d22sLAHdtSE6qCniaGZXeMS5b3kcdx9\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.4;\ninterface ILendingPool {\n\n  /**\n   * @dev Deposits an `amount` of underlying asset into the reserve, receiving in return overlying aTokens.\n   * - E.g. User deposits 100 USDC and gets in return 100 aUSDC\n   * @param asset The address of the underlying asset to deposit\n   * @param amount The amount to be deposited\n   * @param onBehalfOf The address that will receive the aTokens, same as msg.sender if the user\n   *   wants to receive them on his own wallet, or a different address if the beneficiary of aTokens\n   *   is a different wallet\n   * @param referralCode Code used to register the integrator originating the operation, for potential rewards.\n   *   0 if the action is executed directly by the user, without any middle-man\n   **/\n  function deposit(\n    address asset,\n    uint256 amount,\n    address onBehalfOf,\n    uint16 referralCode\n  ) external;\n\n  /**\n   * @dev Allows users to borrow a specific `amount` of the reserve underlying asset, provided that the borrower\n   * already deposited enough collateral, or he was given enough allowance by a credit delegator on the\n   * corresponding debt token (StableDebtToken or VariableDebtToken)\n   * - E.g. User borrows 100 USDC passing as `onBehalfOf` his own address, receiving the 100 USDC in his wallet\n   *   and 100 stable/variable debt tokens, depending on the `interestRateMode`\n   * @param asset The address of the underlying asset to borrow\n   * @param amount The amount to be borrowed\n   * @param interestRateMode The interest rate mode at which the user wants to borrow: 1 for Stable, 2 for Variable\n   * @param referralCode Code used to register the integrator originating the operation, for potential rewards.\n   *   0 if the action is executed directly by the user, without any middle-man\n   * @param onBehalfOf Address of the user who will receive the debt. Should be the address of the borrower itself\n   * calling the function if he wants to borrow against his own collateral, or the address of the credit delegator\n   * if he has been given credit delegation allowance\n   **/\n  function borrow(\n    address asset,\n    uint256 amount,\n    uint256 interestRateMode,\n    uint16 referralCode,\n    address onBehalfOf\n  ) external;\n\n  /**\n   * @dev Returns the user account data across all the reserves\n   * @param user The address of the user\n   * @return totalCollateralETH the total collateral in ETH of the user\n   * @return totalDebtETH the total debt in ETH of the user\n   * @return availableBorrowsETH the borrowing power left of the user\n   * @return currentLiquidationThreshold the liquidation threshold of the user\n   * @return ltv the loan to value of the user\n   * @return healthFactor the current health factor of the user\n   **/\n  function getUserAccountData(address user)\n    external\n    view\n    returns (\n      uint256 totalCollateralETH,\n      uint256 totalDebtETH,\n      uint256 availableBorrowsETH,\n      uint256 currentLiquidationThreshold,\n      uint256 ltv,\n      uint256 healthFactor\n    );\n\n  /**\n   * @dev Allows depositors to enable/disable a specific deposited asset as collateral\n   * @param asset The address of the underlying asset deposited\n   * @param useAsCollateral `true` if the user wants to use the deposit as collateral, `false` otherwise\n   **/\n  function setUserUseReserveAsCollateral(address asset, bool useAsCollateral) external;\n\n\n}\n",
+  "sourcePath": "/Users/doriandruidu/code/dapp-univ-challenge/src/contracts/ILendingPool.sol",
+  "ast": {
+    "absolutePath": "project:/src/contracts/ILendingPool.sol",
+    "exportedSymbols": {
+      "ILendingPool": [
+        141
+      ]
+    },
+    "id": 142,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 88,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".4"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:2"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 141,
+        "linearizedBaseContracts": [
+          141
+        ],
+        "name": "ILendingPool",
+        "nameLocation": "66:12:2",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 89,
+              "nodeType": "StructuredDocumentation",
+              "src": "84:712:2",
+              "text": " @dev Deposits an `amount` of underlying asset into the reserve, receiving in return overlying aTokens.\n - E.g. User deposits 100 USDC and gets in return 100 aUSDC\n @param asset The address of the underlying asset to deposit\n @param amount The amount to be deposited\n @param onBehalfOf The address that will receive the aTokens, same as msg.sender if the user\n   wants to receive them on his own wallet, or a different address if the beneficiary of aTokens\n   is a different wallet\n @param referralCode Code used to register the integrator originating the operation, for potential rewards.\n   0 if the action is executed directly by the user, without any middle-man*"
+            },
+            "functionSelector": "e8eda9df",
+            "id": 100,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "deposit",
+            "nameLocation": "808:7:2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 98,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 91,
+                  "mutability": "mutable",
+                  "name": "asset",
+                  "nameLocation": "829:5:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 100,
+                  "src": "821:13:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 90,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "821:7:2",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 93,
+                  "mutability": "mutable",
+                  "name": "amount",
+                  "nameLocation": "848:6:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 100,
+                  "src": "840:14:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 92,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "840:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 95,
+                  "mutability": "mutable",
+                  "name": "onBehalfOf",
+                  "nameLocation": "868:10:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 100,
+                  "src": "860:18:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 94,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "860:7:2",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 97,
+                  "mutability": "mutable",
+                  "name": "referralCode",
+                  "nameLocation": "891:12:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 100,
+                  "src": "884:19:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint16",
+                    "typeString": "uint16"
+                  },
+                  "typeName": {
+                    "id": 96,
+                    "name": "uint16",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "884:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint16",
+                      "typeString": "uint16"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "815:92:2"
+            },
+            "returnParameters": {
+              "id": 99,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "916:0:2"
+            },
+            "scope": 141,
+            "src": "799:118:2",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 101,
+              "nodeType": "StructuredDocumentation",
+              "src": "921:1189:2",
+              "text": " @dev Allows users to borrow a specific `amount` of the reserve underlying asset, provided that the borrower\n already deposited enough collateral, or he was given enough allowance by a credit delegator on the\n corresponding debt token (StableDebtToken or VariableDebtToken)\n - E.g. User borrows 100 USDC passing as `onBehalfOf` his own address, receiving the 100 USDC in his wallet\n   and 100 stable/variable debt tokens, depending on the `interestRateMode`\n @param asset The address of the underlying asset to borrow\n @param amount The amount to be borrowed\n @param interestRateMode The interest rate mode at which the user wants to borrow: 1 for Stable, 2 for Variable\n @param referralCode Code used to register the integrator originating the operation, for potential rewards.\n   0 if the action is executed directly by the user, without any middle-man\n @param onBehalfOf Address of the user who will receive the debt. Should be the address of the borrower itself\n calling the function if he wants to borrow against his own collateral, or the address of the credit delegator\n if he has been given credit delegation allowance*"
+            },
+            "functionSelector": "a415bcad",
+            "id": 114,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "borrow",
+            "nameLocation": "2122:6:2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 112,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 103,
+                  "mutability": "mutable",
+                  "name": "asset",
+                  "nameLocation": "2142:5:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 114,
+                  "src": "2134:13:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 102,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2134:7:2",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 105,
+                  "mutability": "mutable",
+                  "name": "amount",
+                  "nameLocation": "2161:6:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 114,
+                  "src": "2153:14:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 104,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2153:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 107,
+                  "mutability": "mutable",
+                  "name": "interestRateMode",
+                  "nameLocation": "2181:16:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 114,
+                  "src": "2173:24:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 106,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2173:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 109,
+                  "mutability": "mutable",
+                  "name": "referralCode",
+                  "nameLocation": "2210:12:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 114,
+                  "src": "2203:19:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint16",
+                    "typeString": "uint16"
+                  },
+                  "typeName": {
+                    "id": 108,
+                    "name": "uint16",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2203:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint16",
+                      "typeString": "uint16"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 111,
+                  "mutability": "mutable",
+                  "name": "onBehalfOf",
+                  "nameLocation": "2236:10:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 114,
+                  "src": "2228:18:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 110,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2228:7:2",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2128:122:2"
+            },
+            "returnParameters": {
+              "id": 113,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2259:0:2"
+            },
+            "scope": 141,
+            "src": "2113:147:2",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 115,
+              "nodeType": "StructuredDocumentation",
+              "src": "2264:507:2",
+              "text": " @dev Returns the user account data across all the reserves\n @param user The address of the user\n @return totalCollateralETH the total collateral in ETH of the user\n @return totalDebtETH the total debt in ETH of the user\n @return availableBorrowsETH the borrowing power left of the user\n @return currentLiquidationThreshold the liquidation threshold of the user\n @return ltv the loan to value of the user\n @return healthFactor the current health factor of the user*"
+            },
+            "functionSelector": "bf92857c",
+            "id": 132,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getUserAccountData",
+            "nameLocation": "2783:18:2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 118,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 117,
+                  "mutability": "mutable",
+                  "name": "user",
+                  "nameLocation": "2810:4:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 132,
+                  "src": "2802:12:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 116,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2802:7:2",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2801:14:2"
+            },
+            "returnParameters": {
+              "id": 131,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 120,
+                  "mutability": "mutable",
+                  "name": "totalCollateralETH",
+                  "nameLocation": "2866:18:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 132,
+                  "src": "2858:26:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 119,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2858:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 122,
+                  "mutability": "mutable",
+                  "name": "totalDebtETH",
+                  "nameLocation": "2900:12:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 132,
+                  "src": "2892:20:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 121,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2892:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 124,
+                  "mutability": "mutable",
+                  "name": "availableBorrowsETH",
+                  "nameLocation": "2928:19:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 132,
+                  "src": "2920:27:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 123,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2920:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 126,
+                  "mutability": "mutable",
+                  "name": "currentLiquidationThreshold",
+                  "nameLocation": "2963:27:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 132,
+                  "src": "2955:35:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 125,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2955:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 128,
+                  "mutability": "mutable",
+                  "name": "ltv",
+                  "nameLocation": "3006:3:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 132,
+                  "src": "2998:11:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 127,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2998:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 130,
+                  "mutability": "mutable",
+                  "name": "healthFactor",
+                  "nameLocation": "3025:12:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 132,
+                  "src": "3017:20:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 129,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3017:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2850:193:2"
+            },
+            "scope": 141,
+            "src": "2774:270:2",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 133,
+              "nodeType": "StructuredDocumentation",
+              "src": "3048:266:2",
+              "text": " @dev Allows depositors to enable/disable a specific deposited asset as collateral\n @param asset The address of the underlying asset deposited\n @param useAsCollateral `true` if the user wants to use the deposit as collateral, `false` otherwise*"
+            },
+            "functionSelector": "5a3b74b9",
+            "id": 140,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setUserUseReserveAsCollateral",
+            "nameLocation": "3326:29:2",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 138,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 135,
+                  "mutability": "mutable",
+                  "name": "asset",
+                  "nameLocation": "3364:5:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 140,
+                  "src": "3356:13:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 134,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3356:7:2",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 137,
+                  "mutability": "mutable",
+                  "name": "useAsCollateral",
+                  "nameLocation": "3376:15:2",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 140,
+                  "src": "3371:20:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 136,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3371:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3355:37:2"
+            },
+            "returnParameters": {
+              "id": 139,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3401:0:2"
+            },
+            "scope": 141,
+            "src": "3317:85:2",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 142,
+        "src": "56:3350:2",
+        "usedErrors": []
+      }
+    ],
+    "src": "32:3375:2"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.4+commit.c7e474f2.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.16",
+  "updatedAt": "2024-04-08T09:38:39.607Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "borrow(address,uint256,uint256,uint16,address)": {
+        "details": "Allows users to borrow a specific `amount` of the reserve underlying asset, provided that the borrower already deposited enough collateral, or he was given enough allowance by a credit delegator on the corresponding debt token (StableDebtToken or VariableDebtToken) - E.g. User borrows 100 USDC passing as `onBehalfOf` his own address, receiving the 100 USDC in his wallet   and 100 stable/variable debt tokens, depending on the `interestRateMode`",
+        "params": {
+          "amount": "The amount to be borrowed",
+          "asset": "The address of the underlying asset to borrow",
+          "interestRateMode": "The interest rate mode at which the user wants to borrow: 1 for Stable, 2 for Variable",
+          "onBehalfOf": "Address of the user who will receive the debt. Should be the address of the borrower itself calling the function if he wants to borrow against his own collateral, or the address of the credit delegator if he has been given credit delegation allowance*",
+          "referralCode": "Code used to register the integrator originating the operation, for potential rewards.   0 if the action is executed directly by the user, without any middle-man"
+        }
+      },
+      "deposit(address,uint256,address,uint16)": {
+        "details": "Deposits an `amount` of underlying asset into the reserve, receiving in return overlying aTokens. - E.g. User deposits 100 USDC and gets in return 100 aUSDC",
+        "params": {
+          "amount": "The amount to be deposited",
+          "asset": "The address of the underlying asset to deposit",
+          "onBehalfOf": "The address that will receive the aTokens, same as msg.sender if the user   wants to receive them on his own wallet, or a different address if the beneficiary of aTokens   is a different wallet",
+          "referralCode": "Code used to register the integrator originating the operation, for potential rewards.   0 if the action is executed directly by the user, without any middle-man*"
+        }
+      },
+      "getUserAccountData(address)": {
+        "details": "Returns the user account data across all the reserves",
+        "params": {
+          "user": "The address of the user"
+        },
+        "returns": {
+          "availableBorrowsETH": "the borrowing power left of the user",
+          "currentLiquidationThreshold": "the liquidation threshold of the user",
+          "healthFactor": "the current health factor of the user*",
+          "ltv": "the loan to value of the user",
+          "totalCollateralETH": "the total collateral in ETH of the user",
+          "totalDebtETH": "the total debt in ETH of the user"
+        }
+      },
+      "setUserUseReserveAsCollateral(address,bool)": {
+        "details": "Allows depositors to enable/disable a specific deposited asset as collateral",
+        "params": {
+          "asset": "The address of the underlying asset deposited",
+          "useAsCollateral": "`true` if the user wants to use the deposit as collateral, `false` otherwise*"
+        }
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

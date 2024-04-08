@@ -35,3 +35,11 @@ Web3.js v1.10.0
 % token = await BorrowAAVE.deployed()
 % name = await token.name()
 
+6. use Mocha(comes with Truffle) testing framework and Chai assertion library
+6.1 truffle test
+
+
+5. Start React dev server
+```sh
+% npm run start
+```
