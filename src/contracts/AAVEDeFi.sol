@@ -7,8 +7,8 @@ import './ILendingPool.sol';
 import './IWETHGateway.sol';
 import './IPriceOracle.sol';
 
-contract BorrowAAVE {
-    string public name = "Borrow AAVE";
+contract AAVEDeFi {
+    string public name = "AAVE DeFi";
 
     mapping(address => uint256) public totalETHDeposits;
     mapping(address => uint256) public totalDAIBorrows;

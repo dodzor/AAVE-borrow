@@ -1,5 +1,5 @@
-const BorrowAAVE = artifacts.require("BorrowAAVE");
+const aaveDeFi = artifacts.require("AAVEDeFi");
 
 module.exports = function(deployer) {
-    deployer.deploy(BorrowAAVE);
+    deployer.deploy(aaveDeFi);
 }
