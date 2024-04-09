@@ -1,17 +1,45 @@
 const AAVEDeFi = artifacts.require('./AAVEDeFi')
 
+const Web3 = require('web3')
+const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8549'))
+
+const fromWei = (num) => web3.utils.fromWei(num.toString())
+const toWei = (num) => web3.utils.toWei(num.toString(), "wei")
+
 require('chai')
     .use(require('chai-as-promised'))
     .should()
 
-contract("AAVEDeFi", (accounts) => {
+contract("AAVEDeFi", ([borrower]) => {    
     let aaveDeFi
+    let daiRef 
+    let aWETHRef
+
     let lendingPoolAddressesProvider = "0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5" // mainnet V2 lendingPoolAddresesProvider
     let lendingPoolAddress = "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9" // mainnet lendingPool address
     let priceOracleAddress = "0xA50ba011c48153De246E5192C8f9258A2ba79Ca9" // mainnet Price Oracle address
 
-    before(async () => {
+    let aWETHAddress = "0x030bA81f1c18d280636F32af80b9AAd02Cf0854e" // mainnet aWETH address
+    let daiTokenAddress = "0x6B175474E89094C44Da98b954EedeAC495271d0F" // mainnet DAI address
+
+    beforeEach(async () => {
         aaveDeFi = await AAVEDeFi.deployed()
+
+        // stripped ABI for ERC20 tokens
+        const miniABI = [
+            // balanceOf
+            {
+                "constant":true,
+                "inputs":[{"name":"_owner","type":"address"}],
+                "name":"balanceOf",
+                "outputs":[{"name":"balance","type":"uint256"}],
+                "type":"function"
+            },
+        ]
+
+        daiRef = new web3.eth.Contract(miniABI, daiTokenAddress)
+        aWETHRef = new web3.eth.Contract(miniABI, aWETHAddress)
+
     })
 
     describe('deployment', async () => {
@@ -42,5 +70,42 @@ contract("AAVEDeFi", (accounts) => {
             const priceOracle = await aaveDeFi.priceOracle()
             assert.equal(priceOracle, priceOracleAddress)
         })
+    })
+
+    describe('borrowDAIAgainstETH', async () => {
+        let ethBalance
+        let daiBalance
+        let aWETHBalance
+        let totalETHDeposits
+        let totalDAIBorrows
+        let result
+
+        let ethDeposit = toWei(1) // borrow 1 ETH
+
+        beforeEach(async () => {
+            // start Ether and DAI balance before deposit+borrow
+            ethBalance = await web3.eth.getBalance(borrower)
+            console.log(`Start ETH balance: ${fromWei(ethBalance)}`)
+
+            daiBalance = await daiRef.methods.balanceOf(borrower).call()
+            console.log(`Start DAI balance: ${fromWei(daiBalance)}`)
+
+            aWETHBalance = await aWETHRef.methods.balanceOf(borrower).call()
+            console.log(`Start aWETH balance: ${fromWei(daiBalance)}`)
+
+            totalETHDeposits = await aaveDeFi.totalETHDeposits(borrower)
+            console.log(`START TOTAL ETH DEPOSITS SHOULD BE ZERO: ${fromWei(totalETHDeposits)}`)
+
+            totalDAIBorrows = await aaveDeFi.totalDAIBorrows(borrower)
+            console.log(`START TOTAL DAI BORROWS SHOULD BE ZERO: ${fromWei(totalDAIBorrows)}`)
+
+            result = await aaveDeFi.borrowDAIAgainstETH(ethDeposit, {from: borrower, value: ethDeposit})
+        })
+        
+        it('emits a "DepositBorrow" event', () => {
+            const log = result.logs[0]
+            log.event.should.eq("DepositBorrow")
+        })
+
     })
 })
