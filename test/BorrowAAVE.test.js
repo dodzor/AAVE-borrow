@@ -84,7 +84,7 @@ contract("AAVEDeFi", ([borrower]) => {
 
         beforeEach(async () => {
             // start Ether and DAI balance before deposit+borrow
-            ethBalance = await web3.eth.getBalance(borrower)
+            ethBalance = await web3.eth.getBalance(borrower) //BN
             console.log(`Start ETH balance: ${fromWei(ethBalance)}`)
 
             daiBalance = await daiRef.methods.balanceOf(borrower).call()
@@ -93,10 +93,10 @@ contract("AAVEDeFi", ([borrower]) => {
             aWETHBalance = await aWETHRef.methods.balanceOf(borrower).call()
             console.log(`Start aWETH balance: ${fromWei(daiBalance)}`)
 
-            totalETHDeposits = await aaveDeFi.totalETHDeposits(borrower)
+            totalETHDeposits = await aaveDeFi.totalETHDeposits(borrower) //BN
             console.log(`START TOTAL ETH DEPOSITS SHOULD BE ZERO: ${fromWei(totalETHDeposits)}`)
 
-            totalDAIBorrows = await aaveDeFi.totalDAIBorrows(borrower)
+            totalDAIBorrows = await aaveDeFi.totalDAIBorrows(borrower) // BN
             console.log(`START TOTAL DAI BORROWS SHOULD BE ZERO: ${fromWei(totalDAIBorrows)}`)
 
             result = await aaveDeFi.borrowDAIAgainstETH(ethDeposit, {from: borrower, value: ethDeposit})
@@ -105,6 +105,22 @@ contract("AAVEDeFi", ([borrower]) => {
         it('emits a "DepositBorrow" event', () => {
             const log = result.logs[0]
             log.event.should.eq("DepositBorrow")
+            const event = log.args
+
+            event.ethAmountDeposited.toString().should.equal(ethDeposit.toString())
+            // totalETHDeposits using contract should increase by amount ETH deposited
+            const ethTotalsAdded = +totalETHDeposits.toString() + +ethDeposit.toString()
+            event.totalETHDeposits.toString().should.equal(ethTotalsAdded.toString())
+            // priceDAI must exist and be greate than zero 
+            expect(+event.priceDAI.toString()).to.be.at.least(0)
+            console.log(`priceDAI from Oracle used in contract: ${fromWei(event.priceDAI.toString())}`)
+            console.log(`compared price DAI/ETH at e.g https://www.coingecko.com/en/coins/dai/eth e.g 0.00035312`)
+            // safeMAXDAIBorrows must exist
+            expect(+event.safeMaxDAIBorrow.toString()).to.be.at.least(0);
+            console.log(`SAFE MAX DAI Borrow Amount ${fromWei(event.safeMaxDAIBorrow)}`)
+            // totalDAIBorrows using contract should increase by amount safeMaxDAIBorrow
+            const daiTotalsAdded = +totalDAIBorrows.toString() + +event.safeMaxDAIBorrow.toString()
+            event.totalDAIBorrows.toString().should.equal(daiTotalsAdded.toString())
         })
 
     })
