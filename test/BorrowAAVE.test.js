@@ -39,7 +39,6 @@ contract("AAVEDeFi", ([borrower]) => {
 
         daiRef = new web3.eth.Contract(miniABI, daiTokenAddress)
         aWETHRef = new web3.eth.Contract(miniABI, aWETHAddress)
-
     })
 
     describe('deployment', async () => {
@@ -91,7 +90,7 @@ contract("AAVEDeFi", ([borrower]) => {
             console.log(`Start DAI balance: ${fromWei(daiBalance)}`)
 
             aWETHBalance = await aWETHRef.methods.balanceOf(borrower).call()
-            console.log(`Start aWETH balance: ${fromWei(daiBalance)}`)
+            console.log(`Start aWETH balance: ${fromWei(aWETHBalance)}`)
 
             totalETHDeposits = await aaveDeFi.totalETHDeposits(borrower) //BN
             console.log(`START TOTAL ETH DEPOSITS SHOULD BE ZERO: ${fromWei(totalETHDeposits)}`)
@@ -121,6 +120,34 @@ contract("AAVEDeFi", ([borrower]) => {
             // totalDAIBorrows using contract should increase by amount safeMaxDAIBorrow
             const daiTotalsAdded = +totalDAIBorrows.toString() + +event.safeMaxDAIBorrow.toString()
             event.totalDAIBorrows.toString().should.equal(daiTotalsAdded.toString())
+        })
+
+        it('sucessfully withdraws ETH from user to Aave', async () => {
+            // new ETH balance should decrease by approx ethDeposit
+            // small discrepency may be due to fees
+            const ethBalanceNew = await web3.eth.getBalance(borrower)
+            const ethSubstracted = +ethBalance.toString() - +ethDeposit.toString()
+
+            expect(+ethBalanceNew.toString()).to.be.lessThan(ethSubstracted)
+            console.log(`${fromWei(ethBalanceNew).toString()} is approx ${fromWei(ethSubstracted.toString())}`)
+        })
+
+        it('sucessfully deposits borrowed DAI from Aave to user wallet', async() => {
+            const log = result.logs[0]
+            const event = log.args
+            // new balance DAI balance in USER Wallet should increase by safeMaxDAIBorrow
+            const daiBalanceNew = await daiRef.methods.balanceOf(borrower).call()          
+            const daiAdded = +daiBalance.toString() + +event.safeMaxDAIBorrow.toString()
+            daiBalanceNew.toString().should.equal(daiAdded.toString())
+        })
+          
+        it('sucessfully deposits aToken (aWETH) from Aave to Contract', async() => {
+            // new balance aToken (aWETH) balance in Contract Wallet should at least increase by ethDeposit amount
+            // aToken aWETH is interest bearing so amount changes with time as more is earned
+            const aWETHBalanceNew = await aWETHRef.methods.balanceOf(aaveDeFi.address).call()   
+            const totalAWETH = +aWETHBalance.toString() + +ethDeposit.toString()
+            expect(+aWETHBalanceNew.toString()).to.be.at.least(totalAWETH) 
+            console.log(`New aToken ${fromWei(aWETHBalanceNew)} balance is greater or equal old balance ${fromWei(aWETHBalance)} + depositAmount ${fromWei(ethDeposit)}`)       
         })
 
     })
