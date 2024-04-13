@@ -22,6 +22,8 @@ contract AAVEDeFi {
     address daiTokenAddress;
     address aWETHTokenAddress;
 
+    uint256 public daiEthprice;
+
      /// @notice DepositBorrow event emitted on success
     event DepositBorrow(
         uint256 ethAmountDeposited, 
@@ -59,6 +61,7 @@ contract AAVEDeFi {
         // Use Oracle to DAI/ETH 
         uint priceDAI = priceOracle.getAssetPrice(daiTokenAddress);
         assert(priceDAI != 0);
+        daiEthprice = priceDAI;
 
         // Borrow the safeMaxDAIBorrow amount from protocol(calculated in frontend)
         lendingPool.borrow(daiTokenAddress, safeMaxDAIBorrow, variableRate, referralCode, onBehalfOf);

@@ -1,7 +1,7 @@
 const AAVEDeFi = artifacts.require('./AAVEDeFi')
 
 const Web3 = require('web3')
-const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8549'))
+const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
 
 const fromWei = (num) => web3.utils.fromWei(num.toString())
 const toWei = (num) => web3.utils.toWei(num.toString(), "wei")
@@ -111,6 +111,7 @@ contract("AAVEDeFi", ([borrower]) => {
             const ethTotalsAdded = +totalETHDeposits.toString() + +ethDeposit.toString()
             event.totalETHDeposits.toString().should.equal(ethTotalsAdded.toString())
             // priceDAI must exist and be greate than zero 
+            console.log(event.priceDAI.toString())
             expect(+event.priceDAI.toString()).to.be.at.least(0)
             console.log(`priceDAI from Oracle used in contract: ${fromWei(event.priceDAI.toString())}`)
             console.log(`compared price DAI/ETH at e.g https://www.coingecko.com/en/coins/dai/eth e.g 0.00035312`)
