@@ -45,7 +45,7 @@ class App extends Component {
     ]
     }
 
-    // this.handleChange = this.handleChange.bind(this);
+    // this.handleChange = this.handleChange.bind(this); //this is not needed when using arrow functions
   }
 
   async componentDidMount() {
@@ -152,10 +152,32 @@ class App extends Component {
     }
   }
 
-  handleChange = (event) => {
+  handleChange = async (event) => {
       const ethDeposit = toWei(event.target.value)
-      this.setState({ethDeposit})
-      console.log(`ETH DEPOSIT: ${this.state.ethDeposit}`)
+      await this.setState({ethDeposit})
+      console.log(`ETH DEPOSIT: ${ethDeposit}`)
+  }
+
+  borrowDAI = async () => {
+    console.log('Starting process borrowing DAI from Aave')
+    const ltv = 0.8 // loan to value ratio for ETH
+    const safetyFactor = 0.6 // borrow only portion of max allowable to avoid liquidations
+    const ethAmount = +this.state.ethDeposit.toString()
+    const maxSafeETHBorrow = ltv * ethAmount
+    const daiEthPriceValue = +this.state.daiETHPrice.toString()
+    const safeMaxDAIBorrow = maxSafeETHBorrow * safetyFactor/ daiEthPriceValue / 10**18
+    const safeMaxDAIBorrowWei = toWei(safeMaxDAIBorrow)
+    const safeMaxDAIBorrowWeiBN = new this.state.web3.utils.BN(safeMaxDAIBorrowWei)
+    console.log(safeMaxDAIBorrowWeiBN);
+
+    await this.setState({loading: true})
+    this.state.aaveDeFi.methods.borrowDAIAgainstETH(safeMaxDAIBorrowWeiBN)
+    .send({from: this.state.account, value: this.state.ethDeposit})
+    .on('transactionHash', (hash) => {
+      this.setState({loading: false})
+      window.location.reload()
+      console.log('Successfully completed borrowing DAI')
+    })
   }
 
   render() {
@@ -197,6 +219,58 @@ class App extends Component {
                   >
                     Borrow DAI
                   </button>
+                  {this.state.loading ? 
+                    <div>Loading...</div> :
+                  <>
+                      <p className="mt-5">View WALLET balances below!</p>
+                      <div className="row justify-content-center">
+                        <div className="col-auto">
+                          <table className ="table table-responsive m-auto">
+                            <thead>
+                              <tr>
+                                <th scope="col">ETH Balance</th>
+                                <th scope="col">DAI Balance</th>
+                                <th scope="col">aWETH Balances(*AaveDeFi Contract*)</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>{this.state.ethBalance}</td>
+                                <td>{this.state.daiBalance}</td>
+                                <td>{this.state.aWETHBalances}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>          
+                      <hr/>
+                      <p className="mt-5">View your TOTAL Deposits and TOTAL BORROWS on our AaveDeFi Contract!</p>
+                      <div className="row justify-content-center">
+                        <div className ="col-auto">
+                          <table className ="table table-responsive m-auto">
+                            <thead>
+                              <tr>
+                                <th scope="col">Total ETH Deposits</th>
+                                <th scope="col">Total DAI Borrows</th>
+                                <th scope="col">Latest DAI/ETH price used</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>{this.state.totalETHDeposits}</td>
+                                <td>{this.state.totalDAIBorrows}</td>                              
+                                <td><a 
+                                  href="https://www.coingecko.com/en/coins/dai/eth" 
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >{this.state.daiETHPrice}</a></td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </>  
+                }
                 </div> 
               </div>
             </main>
