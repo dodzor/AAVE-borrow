@@ -5,10 +5,7 @@ import AaveDefi from '../abis/AAVEDeFi.json'
 import './App.css'
 
 const fromWei = (str) => (+str / 10**18).toString()
-
 const toWei = (str) => (+str * 10**18).toString()
-
-
 
 class App extends Component {
   constructor(props) {
@@ -16,6 +13,7 @@ class App extends Component {
 
     this.state = {
       web3: '',
+      ethers: '',
       account: '',
       aaveDeFi: '',
       aaveDeFiAddress: '',
@@ -26,23 +24,24 @@ class App extends Component {
       daiBalance: 0,
       ethDeposit: 0,
       miniABI: [ //Stripped ERC20 miniABI
-      // balanceOf
-      {
-        "constant":true,
-        "inputs":[{"name":"_owner","type":"address"}],
-        "name":"balanceOf",
-        "outputs":[{"name":"balance","type":"uint256"}],
-        "type":"function"
-      },
-      // decimals
-      {
-        "constant":true,
-        "inputs":[],
-        "name":"decimals",
-        "outputs":[{"name":"","type":"uint8"}],
-        "type":"function"
-      }
-    ]
+        // balanceOf
+        {
+          "constant":true,
+          "inputs":[{"name":"_owner","type":"address"}],
+          "name":"balanceOf",
+          "outputs":[{"name":"balance","type":"uint256"}],
+          "type":"function"
+        },
+        // decimals
+        {
+          "constant":true,
+          "inputs":[],
+          "name":"decimals",
+          "outputs":[{"name":"","type":"uint8"}],
+          "type":"function"
+        }
+      ],
+      daiTokenAddress: "0x6B175474E89094C44Da98b954EedeAC495271d0F"
     }
 
     // this.handleChange = this.handleChange.bind(this); //this is not needed when using arrow functions
@@ -50,12 +49,16 @@ class App extends Component {
 
   async componentDidMount() {
     await this.loadWeb3()
+    await this.loadEthers()
     await this.loadBlockchainData()
+    await this.loadBlockchainDataUsingEthers()
     await this.loadTotalEthDeposits()
+    await this.loadTotalEthDepositsUsingEthers()
     await this.loadTotalDaiBorrows()
     await this.loadDaiEthPrice()
     await this.loadETHBalance()
     await this.loadDAIBalance()
+    await this.loadDAIBalanceUsingEthers()
     await this.loadATokenBalance()
   }
 
@@ -67,6 +70,16 @@ class App extends Component {
     } else if (window.web3) {
       window.web3 = new Web3(window.web3.currentProvider)
       this.setState({web3: window.web3})
+    } else {
+      window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!')
+    }
+  }
+  
+
+  async loadEthers() {
+    if (window.ethereum) {
+      const connection = new ethers.providers.Web3Provider(window.ethereum)
+      this.setState({ethers: connection})
     } else {
       window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!')
     }
@@ -86,7 +99,25 @@ class App extends Component {
       this.setState({aaveDeFiAddress: networkData.address})
       this.setState({aaveDeFi})
       // set loading false after getting from blockchain
-      await this.setState({ loading: false})
+      this.setState({ loading: false})
+    } else {
+      window.alert('AaveDeFi contract not deployed to detected network.')
+    }
+  }
+
+  async loadBlockchainDataUsingEthers() {
+    const ethersProvider = this.state.ethers
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+
+    //const { chainId } = await ethers.getNetwork() //1337
+    const chainId = 1
+    const networkData = AaveDefi.networks[chainId];
+    if (networkData) {
+      const aaveDeFiEthers = new ethers.Contract(networkData.address, AaveDefi.abi, ethersProvider)
+      this.setState({aaveDeFiAddress: networkData.address})
+      this.setState({aaveDeFiEthers})
+        // set loading false after getting from blockchain
+      this.setState({ loading: false})
     } else {
       window.alert('AaveDeFi contract not deployed to detected network.')
     }
@@ -96,6 +127,12 @@ class App extends Component {
     let totalETHDeposits = await this.state.aaveDeFi.methods.totalETHDeposits(this.state.account).call()
     console.log("TOTAL ETH DEPOSITS" + totalETHDeposits.toString())
     totalETHDeposits = fromWei(totalETHDeposits.toString())
+    this.setState({totalETHDeposits})
+  }
+
+  async loadTotalEthDepositsUsingEthers() {
+    let totalETHDeposits = await this.state.aaveDeFiEthers.totalETHDeposits(this.state.account)
+    totalETHDeposits = fromWei(totalETHDeposits)
     this.setState({totalETHDeposits})
   }
 
@@ -128,14 +165,21 @@ class App extends Component {
 
   async loadDAIBalance() {
     const web3 = this.state.web3
-
-    let daiTokenAddress = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
-    let contract = new web3.eth.Contract(this.state.miniABI, daiTokenAddress)
+    let contract = new web3.eth.Contract(this.state.miniABI, this.state.daiTokenAddress)
     
     if(this.state.account) {
       let daiBalance = await contract.methods.balanceOf(this.state.account).call()
       daiBalance = fromWei(daiBalance.toString())
       this.setState({daiBalance})
+    }
+  }
+
+  async loadDAIBalanceUsingEthers() {
+    let contract = new ethers.Contract(this.state.daiTokenAddress, this.state.miniABI, this.state.ethers)
+
+    if (this.state.account) {
+      let daiBalance = await contract.balanceOf(this.state.account)
+      daiBalance = fromWei(daiBalance)
     }
   }
 
