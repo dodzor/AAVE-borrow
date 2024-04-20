@@ -78,6 +78,4 @@ contract AAVEDeFi {
             totalDAIBorrows[msg.sender]
         );
     } 
-
-
 }

@@ -41,7 +41,6 @@ Web3.js v1.10.0
 % npx truffle test
 ```
 
-
 5. Start React dev server
 ```sh
 % npm run start

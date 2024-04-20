@@ -60,6 +60,43 @@ class App extends Component {
     await this.loadDAIBalance()
     await this.loadDAIBalanceUsingEthers()
     await this.loadATokenBalance()
+    await this.getAccountUsingWeb3()
+    await this.getAccountUsingEthers()
+  }
+
+  getWeb3Provider() {
+    let provider
+    if (window.ethereum) {
+      provider = new Web3(window.ethereum)
+    }
+    return provider
+  }
+  
+  getEthersProvider() {
+    let provider
+    if (window.ethereum) {
+      provider = new ethers.providers.Web3Provider(window.ethereum)
+    }
+    return provider
+  }
+
+  async getAccountUsingWeb3() {
+    const web3 = this.getWeb3Provider()
+    let account
+    
+    if (web3) {
+      const accounts = await web3.eth.getAccounts()
+      account = accounts[0]
+    }	
+    return account
+  }
+
+  async getAccountUsingEthers() {
+    if (window.ethereum) {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+      const account = ethers.utils.getAddress(accounts[0])
+      return account
+    }
   }
 
   async loadWeb3() {
